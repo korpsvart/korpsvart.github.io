@@ -1,0 +1,679 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Hugo 0.83.1">
+    <title>Top navbar example · Bootstrap v5.0</title>
+
+    <link rel="canonical" href="https://getbootstrap.com/docs/5.0/examples/navbar-static/">
+
+
+
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        .bd-placeholder-img {
+            font-size: 1.125rem;
+            text-anchor: middle;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
+        }
+
+        @media (min-width: 768px) {
+            .bd-placeholder-img-lg {
+                font-size: 3.5rem;
+            }
+        }
+    </style>
+
+
+    <!-- Custom styles for this template -->
+    <link href="css/navbar-top.css" rel="stylesheet">
+
+    <script src="js/uikit.min.js"></script>
+    <script src="js/uikit-icons.min.js"></script>
+    <script src="https://fred-wang.github.io/mathml.css/mspace.js"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async
+            src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="index.html">Raytracer</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav me-auto mb-2 mb-md-0">
+                <li class="nav-item">
+                    <a class="nav-link" aria-current="page" href="index.html">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="usermanual.html">Manuale utente</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="applet.html">Teoria</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="theory.html">Applet</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<main class="container">
+    <div class="bg-light p-5 rounded">
+        <h1 class="mt-5 mb-5">Raytracing</h1>
+        <p>Il ray tracing è una tecnica di rendering in grado di produrre immagini virtuali con un elevato livello di realismo,
+            pur basandosi su un principio molto semplice. L'idea è quella di seguire il percorso della luce all'interno della scena,
+            che parte da una sorgente luminosa e interagisce con l'ambiente circostante
+            (attraverso fenomeni fisici come rifrazione, riflessione, diffusione....)
+            prima di raggiungere il nostro occhio, rendendo quindi visibili gli oggetti.
+            <br>
+            In realtà, a livello computazionale è molto più efficiente seguire questo percorso in direzione opposta, immaginando
+            che il raggio di luce parta dal nostro occhio, poichè solo una piccola parte dei raggi emessi da una sorgente luminosa
+            raggiunge effettivamente l'occhio.
+            Questo approccio prende in particolare il nome di <b>backward ray tracing</b>.
+            <br>
+            Per creare un immagine digitale 2D formata da pixel, un raggio di questo tipo (detto <b>primary </b> o <b>view ray</b>) viene
+            creato per ciascuno dei pixel. Se tale raggio interseca (<b><i>visibility problem</i></b>) un oggetto della scena, è possibile quindi calcolare
+            l'illuminazione di tale oggetto nel punto di intersezione (procedimento che prende il nome di <b>shading</b>) ed assegnare
+            il colore risultante al pixel d'interesse.
+            <img class="img-fluid" src="img/ray_tracing.png">
+        </p>
+        <h2 class="mt-5 mb-5">Shading</h2>
+        <p>Il modo in cui viene calcolata l'illuminazione di un punto della scena dipende principalmente dalle proprietà del materiale
+            di cui è composto l'oggetto che stiamo guardando, che determinano il modo in cui la luce interagisce con esso.
+            Dal punto di vista della <b>riflessione</b>, possiamo identificare tre tipi di riflessione:
+        <ul class="">
+            <li>Rifflessione speculare: si ottiene attraverso la <b>legge della riflessione</b>, che afferma
+                <ul class="">
+                    <li>Il raggio di incidenza, la normale alla superficie e il raggio riflesso sono coplanari;</li>
+                    <li>L'angolo di incidenza è uguale all'angolo di riflessione.</li>
+                </ul>
+                Questo tipo di riflessione è evidente negli specchi e più in generale nei materiali cosiddetti <i>lucidi</i>.
+            </li>
+            <li>Riflessione diffusa: si ha quando la luce proveniente da una direzione viene riflessa in molteplici direzioni diverse, invece che essere
+                concentrata in un'unica direzione come succede nel caso della riflessione speculare.
+                Questo tipo di riflessione è evidente negli oggetti detti <i>opachi</i>. Per un oggetto opaco ideale, la luce incidente viene riflessa equamente in tutte
+                le direzioni, ne consegue quindi che l'illuminazione percepita non cambia al variare della direzione da cui guardiamo l'oggetto (<i>view direction</i>).
+                Questo tipo di superficie ideale è anche nota come <b>superficie Lambertiana</b>.
+            </li>
+        </ul>
+        Chiaramente, gli oggetti reali esibiscono sempre una componente di riflessione specualare ed una di riflessione diffusa.
+        Alcuni modelli empirici utilizzati per simulare l'illuminazione di oggetti reali funzionano combinando
+        opportunamente l'illuminazione che si avrebbe da una superficie perfettamente speculare con quella
+        ottenibile da una perfettamente diffusa (vedi il <b>modello di Phong</b>).
+        <br>
+        Il programma prevede tre tipi di oggetti, a seconda del modo in cui interagiscono con la luce:
+        <ul class="">
+            <li>Oggetti <i>diffuse</i> (opachi, o <i>diffondenti</i>)</li>
+            <li>Oggetti <i>Phong</i> (seguono il modello di Phong)</li>
+            <li>Oggetti <i>mirror-like</i> (specchi)</li>
+            <li>Oggetti <i>trasparenti</i> (e.g.: acqua, vetro, ...)</li>
+        </ul>
+        </p>
+        <h2 class="mt-5 mb-5">Fonti luminose</h2>
+        <p>
+            Sono previsti due tipi di fonti luminose:
+        <ul class="">
+            <li>Luci puntiformi (o luci sferiche): definite unicamente dalla loro posizione nello spazio (non sono influenzate
+                da rotazioni o scalature, in quanto adimensionali). Utili per rappresentare piccole fonti di luce come
+                lampadine, di cui però viene ignorata la "fisicità" per maggiore semplicità.</li>
+            <li>Luci distanti: definite unicamente dalla loro direzione (non sono influenzate da traslazioni
+                o scalature). Utili per rappresentare fonti luminose molto distanti, come il Sole, per cui si possono
+                considerare tutti i raggi emessi come paralleli tra loro.</li>
+        </ul>
+        Oltre alle proprietà sopra descritte, ogni fonte luminosa è definita da <b>colore</b> ed <b>intensità</b>.
+        <h2 class="mt-5 mb-5">Square rolloff</h2>
+        Per le luci sferiche , l'illuminazione dipende anche dalla distanza a cui un oggetto si trova.
+        Più precisamente, si può considerare una luce sferica puntiforme come una fonte luminosa isotropa, che emette luce in maniera
+        uguale in tutte le direzioni. In tal caso, si può applicare la seguente legge di proporzionalità:
+        <br>
+        \begin{equation} I = \frac{P}{4\pi r^{2} } \end{equation}
+        <br>
+        Dove \(I\) è l'intensità luminosa, \(r\) è la distanza dalla sorgente e \(P\) è la potenza totale.
+        </p>
+
+        <h2 class="mt-5 mb-5">Illuminazione su superfici lambertiane</h2>
+        <img class="shadow-lg rounded img-fluid float-end" width=45% src="img/diffuse_example.PNG">
+        <p>
+            La legge di Lambert afferma che l'illuminamento prodotto da una sorgente su una superficie è direttamente
+            proporzionale all'intensità luminosa della sorgente e al coseno dell'angolo che la normale alla superficie forma
+            con la direzione dei raggi luminosi.
+            <br>
+            \begin{equation} E = I\cdot \cos \alpha = I \cdot \textbf{n} \boldsymbol{\cdot}\textbf{l} \end{equation}
+            <br>
+            Dove \(\textbf{n} \) è il versore normale alla superficie, mentre \(\textbf{l} \) è il versore della direzione
+            dei raggi luminosi.
+            .Più precisamente, per una luce puntiforme
+            \begin{equation} \textbf{l} = \frac{\textbf{P}_{light} - \textbf{P}_{hit}}
+            {\left \|  \textbf{P}_{light} - \textbf{P}_{hit}\right \|} \end{equation}
+            dove \(\textbf{P}_{hit} \) è il punto
+            considerato sulla superficie, mentre \( \textbf{P}_{light}\) è il punto che identifica la posizione di una sorgente
+            luminosa puntiforme. Per una luce distante, invece, la direzione è una proprietà intrinseca della sorgente luminosa.
+            <br>
+            L'intensità luminosa che compare nella formula, \( I \), è calcolata per le sorgenti puntiformi utilizzando la legge inversa
+            del quadrato descritta precedentemente, mentre per le luci distanti si utilizza direttamente l'intensità luminosa alla
+            sorgente.
+            <br>
+            L'intensità luminosa della superficie dipende poi, ovviamente, anche da quanta della luce ricevuta viene riflessa
+            nelle varie direzioni e da quanta viene invece assorbita. Il rapporto tra la quantità di luce emessa e quella ricevuta
+            è detta <b>albedo</b>.
+            Quindi, l'ammontare totale di energia luminosa riflessa dalla superficie diffondente è dato da:
+            <br>
+            \begin{equation} F_{tot} = albedo \cdot E = albedo \cdot I\cdot \cos \alpha \end{equation}
+            <br>
+            Poichè questa energia viene distribuita uniformemente su un emisfero centrato sul punto osservato ed orientato
+            nella direzione della normale alla superficie, per ottenere la quantità di luce riflessa nella direzione della visuale
+            bisogna dividere per \( \pi \).
+            <br>
+            \begin{equation} L = \frac{F_{tot}}{\pi} \end{equation}
+            <br>
+            Come anticipato, la quantità di luce riflessa è indipendente dalla direzione della visuale.
+        </p>
+        <h2 class="mt-5 mb-5">Riflessione speculare</h2>
+        Usando la legge della riflessione, date la direzione incidente \( \textbf{l} \) e la normale \( \textbf{n} \)
+        (si assume entrambi siano vettori di norma unitaria) è facile calcolare la direzione della riflessione:
+        <br>
+        <p class="uk-align-center">
+             \begin{equation}\textbf{r} = 2(\textbf{n}\cdot \textbf{i})\textbf{n} - \textbf{i} \end{equation}
+        </p>
+        <br>
+
+        <img class="shadow-lg rounded img-fluid float-end" width="35%" src="img/reflection_dir.png">
+
+        <br>
+        <br>
+        A livello implementativo, quando la direzione della visuale interseca una superficie riflettente, calcoliamo
+        la direzione di riflessione e generiamo un nuovo "raggio", avente come origine il punto di intersezione e come
+        direzione quella di riflessione. Questo raggio può potenzialmente intersecare a sua volta una superficie riflettente,
+        di conseguenza il processo è ricorsivo. Potenzialmente, una scena potrebbe causare una ricorsione infinita, o comunque
+        generare un numero così elevato di riflessioni da rendere la computazione molto lenta (senza particolari miglioramnti
+        dal punto di vista del realismo dell'immagine ottenuta).
+        Per questo motivo, si definisce una costante che limita il numero massimo di livelli che può raggiungere questo
+        procedimento ricorsivo (le immagini dimostrative sono state generate usando come limite 5 livelli).
+        <br><br><br>
+        <img class="shadow-lg rounded img-fluid mx-auto d-block" width="40%"  src="img/reflection_ex.PNG">
+        <br>
+
+        <br>
+        <h2 class="mt-5 mb-5">Rifrazione</h2>
+        Quando un raggio di luce "passa" da un mezzo trasparente ad un altro, la sua direzione viene alterata. La nuova direzione
+        dipende dalla direzione incidente e dagli indici di rifrazione dei due mezzi. L'indice di rifrazione è un numero adimensionale
+        definito come il rapporto tra la velocità della luce nel vuoto e la velocità di fase della radiazione che attraversa il mezzo:
+        <img class="shadow-lg rounded img-fluid float-end m-3" src="img/refraction_dir.PNG">
+        <br>
+        \begin{equation}  \eta = \frac{c}{v} \end{equation}
+        <br>
+        Per ricavare la direzione di rifrazione si utilizza la legge di Snell:
+        <br>
+        \begin{equation} \frac{\sin{\theta_1}}{\sin{\theta_2}} = \frac{\eta_2}{\eta_1} \end{equation}
+        <br>
+        dove \( \theta_1 \) è l'angolo di incidenza, mentre \( \theta_2 \) è l'angolo di rifrazione.
+        <br>
+        <br>
+        Data la direzione incidente \( \textbf{i} \) e quella della normale \( \textbf{n} \), con alcuni passaggi si ricava
+        la direzione del raggio rifratto:
+        <br>
+        \begin{equation}
+        \textbf{t} = \eta \textbf{i} + (\eta c - \sqrt{h} )\textbf{n} \\
+        \end{equation}
+        <br>
+        \begin{equation}
+        \text{dove} \quad \eta = \frac{\eta_1}{\eta_2} ; \quad
+        c = \textbf{n} \cdot \textbf{i} = \cos{\theta_1} ; \quad
+        h = 1 - \eta^2 (1-c^2)
+        \end{equation}
+        <br>
+        Quando passando da un mezzo ad un altro l'indice di rifrazione aumenta, se l'angolo di incidenza supera l'
+        <b>angolo critico</b>, si verifica un fenomeno detto <b>riflessione interna totale</b>: la luce viene completamente
+        riflessa e non si ha rifrazione. L'angolo critico si ottiene partendo dalla legge di Snell ed imponendo
+        \begin{equation}
+        \theta_2 = \frac{\pi}{2}  \Rightarrow \sin{\theta_2} = 1  \Rightarrow
+        \theta_{crit} = \arcsin{(\frac{\eta_1}{\eta_2})}
+        \end{equation}
+        <br>
+        Si ha quindi riflessione interna totale quando
+        <br>
+        \begin{equation}
+        \theta_1 > \theta_{crit}
+        \end{equation}
+        <br>
+        che è analogo a verificare
+        \(
+        h < 0
+        \)
+        <br>
+        <h3 class="mt-5 mb-5">Legge di Fresnel</h3>
+        Gli oggetti trasparenti esibiscono in realtà sia rifrazione che riflessione. La quantità di luce che viene riflessa
+        o rifratta dipende dall'angolo di incidenza. All'aumentare dell'angolo di incidenza la quantità di luce rifratta
+        diminuisce sempre più, fino a diventare nulla nel caso della riflessione totale interna.
+        Precisamente, la frazione di luce che viene riflessa si può calcolare usando la <b>legge di Fresnel</b>:
+        <img class="shadow-lg rounded img-fluid float-end m-3" width="50%" src="img/fresnel_eq_graph.png">
+        <br>
+        \begin{equation}
+        R = \frac{I_r}{I_i}
+        \end{equation}
+        <br>
+        \(R \) è il coefficiente di riflessione, rapporto tra l'intensità della radiazione riflessa
+        \((I_r)\) e della radiazione incidente \((I_i)\).
+        <br>
+        Questo viene separato in due componenti con polarizzazione perpendicolare tra loro:
+        <br>
+        \begin{equation}
+        R_s = (\frac{\eta_1 \cos{\theta_1} - \eta_2 \cos{\theta_2}}
+        {\eta_1 \cos{\theta_1} + \eta_2 \cos{\theta_2}})^2
+        \quad
+        R_p = (\frac{\eta_1 \cos{\theta_2} - \eta_2 \cos{\theta_1}}
+        {\eta_1 \cos{\theta_2} + \eta_2 \cos{\theta_1}})^2
+        \end{equation}
+        <br>
+        Per ottenere il coefficiente di riflessione effettivo per una luce "naturale"
+        (che viene solitamente descritta come non polarizzata), si calcola una media delle due componenti:
+        <br>
+        \begin{equation}
+        R_{eff} = \frac{R_s + R_p}{2}
+        \end{equation}
+        <br>
+        La frazione di luce rifratta si calcola semplicemente come:
+        <br><br><br>
+        \begin{equation}
+        T_{eff} = 1 - R_{eff}
+        \end{equation}
+        <br>
+        Questi due sono i coefficienti che utilizziamo nella pratica per "pesare" le due componenti di rifrazione e di riflessione.
+        <br>
+        Anche calcolare l'illuminazione di una superficie trasparente, avendo sempre una componente riflettente, è un procedimento
+        ricorsivo. Per oggetti geometrici molto semplici, come le sfere visibili nell'immagine seguente, il limite di 5 <i>livelli</i>
+        che imponiamo alla ricorsione è sufficiente per ottenere ottimi risultati. Tuttavia, lo stesso non si può dire nel
+        caso di oggetti trasparenti complicati, come un oggetto ottenuto tramite incollamento di più superfici (di Bézier o spline,
+        ad esempio) e triangolazione.
+        <br>
+        <img class="shadow-lg img-fluid mx-auto rounded m-3 d-block" width="80%" src="img/transparent_ex.PNG">
+        <h2 class="mt-5 mb-5">Superfici di Bézier</h2>
+        <img class="shadow-lg float-end rounded m-3" width="40%" src="img/bezier_example.png">
+        Una superficie di Bézier di bigrado (m,n) è definita da una griglia bidimensionale di (m+1)*(n+1) punti di controllo
+        \( \{ \textbf{P}_{i,j} \} \), che costituiscono il cosiddetto <b>poliedro di controllo</b>.
+        Come superficie parametrica, una superficie di Bézier è una funzione di due parametri \( (u, v) \), dove il valore
+        della superficie nel punto \( \textbf{P}(u,v) \) è così calcolabile:
+        <br>
+        <div class="uk-align-center" style="text-align: center;">
+            \begin{equation}
+            \textbf{P}(u,v) =
+            \sum_{i=0}^{m}
+            \sum_{j=0}^{n}
+            B_i^m(u)
+            B_j^n(v)
+            \textbf{P}_{i,j}
+
+            \quad\quad
+            u, v  \in [0,1]
+            \end{equation}
+        </div>
+        <br>
+        Dove \( B_i^m(u) \) è un polinomio di Bernstein, così definito in generale:
+        <br>
+        <div class="uk-align-center" style="text-align: center;">
+            \begin{equation}
+            B_i^m(u) =  \binom{m}{i}u^i(1-u)^{n-i}
+            \end{equation}
+        </div>
+        <br>
+        Come le curve di Bézier, le superfici godono di diverse proprietà utili:
+        <ul class="uk-list uk-list-disc">
+            <li>Sono invarianti rispetto alle trasformazioni affini dei punti di controllo</li>
+            <li>Iniziano e finiscono nei punti di controllo, ovvero:
+                <br>
+                <div class="uk-align-center" style="text-align: center;">
+                    \begin{equation}
+                    \textbf{P}(0,0) = \textbf{P}_{0,0}
+                    \quad
+                    \textbf{P}(1,0) = \textbf{P}_{m,0}
+                    \quad
+                    \textbf{P}(0,1) = \textbf{P}_{0,n}
+                    \quad
+                    \textbf{P}(1,1) = \textbf{P}_{m,n}
+                    \end{equation}
+                </div>
+                <br>
+            </li>
+            <li>Sono sempre contenute nell'inviluppo convesso dei punti di controllo.</li>
+        </ul>
+        Oltre che utilizzando l'equazione parametrica illustrata sopra, è possibile calcolare un punto di una superficie di Bèzier
+        anche applicando due volte l'<b>algoritmo di de Casteljau per le curve di Bézier</b>. Infatti, data una coppia di parametri
+        \( (\bar{u},\bar{v}) \) si può procedere così:
+        <ul class="uk-list uk-list-disc">
+            <li>Portiamo fuori dalla sommatoria più interna i polinomi di Bernstein di grado \( m \), che non dipendono
+                dall'indice \( j \):
+                <br>
+                <div class="uk-align-center" style="text-align: center;">
+                    \begin{equation}
+                    \textbf{P}(u,v) =
+                    \sum_{i=0}^{m}
+                    B_i^m(u)
+                    (
+                    \sum_{j=0}^{n}
+                    B_j^n(v)
+                    \textbf{P}_{i,j}
+                    )
+                    \end{equation}
+                </div>
+                <br>
+            </li>
+            <li>
+                Definiamo, per ogni \( i \in \{0, ..., m\} \)
+                <br>
+                <div class="uk-align-center" style="text-align: center;">
+                    \begin{equation}\textbf{Q}_i(v) = \sum_{j=0}^{n}
+                    B_j^n(v)
+                    \textbf{P}_{i,j}
+                    \end{equation}
+                </div>
+                <br>
+                Abbiamo quindi \( m+1 \) curve di Bézier di grado \( n+1 \), ciascuna definita rispettivamente dai punti di controllo
+                \( \textbf{P}_{i,0}, ..., \textbf{P}_{i,n} \) (l'\(i\)-esima colonna del poliedro di controllo).
+            </li>
+            <li>
+                Possiamo quindi valutare ciascuna di queste curve (usando l'algoritmo di de Casteljau) per \( v = \bar{v} \) ed ottenere \( m+1 \) punti, ricavando quindi:
+                <br>
+                <div class="uk-align-center" style="text-align: center;">
+                    \begin{equation}
+                    \textbf{P}(u,\bar{v}) =
+                    \sum_{i=0}^{m}
+                    B_i^m(u)
+                    \textbf{Q}_i(\bar{v})
+                    \end{equation}
+                </div>
+            </li>
+            <li>
+                Quella ottenuta così è una curva di Bézier nella direzione \( u \), di grado \( m+1 \), che possiamo facilmente
+                valutare per \( u = \bar{u} \)
+            </li>
+        </ul>
+        Sebbene l'algoritmo di de Casteljau sia più lento del metodo "diretto" per calcolare un punto su una curva di Bézier,
+        è numericamente più stabile e permette di calcolare al tempo stesso il vettore tangente alla curva.
+        Applicato alle superfici di Bézier, questo ci permette di evitare di dover calcolare separatamente uno dei due vettori
+        tangenti (a seconda di quale parametro "fissiamo" per primo), necessari a calcolare il vettore normale alla superficie.
+        <img class="shadow-lg img-fluid mx-auto rounded m-3 d-block" width="70%" src="img/teapot_example.png">
+        <h3 class="mt-5 mb-5">Triangolazione di superfici</h3>
+        <img class="shadow-lg float-end img-fluid m-3" width="40%" src="img/surface_triangulation.png">
+        Calcolare direttamente l'intersezione di una retta con una superficie di Bézier è difficile e computazionalmente inefficiente,
+        per cui solitamente queste vengono triangolate prima di farne un rendering tramite ray tracing.
+        Per triangolare una superficie di Bézier, è più semplice triangolare il suo dominio (il quadrato unitario, normalmente),
+        suddividendolo prima in rettangoli e successivamente suddividendo ogni rettangolo in due triangoli.
+        Per semplicità, il programma di rendering sviluppato prevede una suddivisione uniforme e uguale in entrambe le direzioni
+        \( u \) e \( v \). Poichè l'effettiva forma ed estensione della porzione di superficie su cui ogni triangolo viene mappato
+        è ignorata, questo approccio può essere inefficiente o dare risultati esteticamente meno piacevoli rispetto
+        ad un algoritmo "adattivo".
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <h2 class="mt-5 mb-5">Curve B-Spline</h2>
+        Le curve B-Spline offrono diversi vantaggi rispetto alle curve di Bézier, di cui rappresentano una generalizzazione.
+        Infatti, le curve di Bézier possiedono alcune importanti limitazioni:
+        <ul class="uk-list uk-list-disc">
+            <li>
+                Il grado della curva è strettamente legato al numero dei punti di controllo. Quindi, curve con un numero
+                elevato di punti di controllo diventano rapidamente inefficienti da gestire computazionalmente, in quanto
+                richiedono di lavorare con polinomi di grado elevato.
+                <br>
+                Nelle curve B-Spline, il numero di punti controllo non dipende dal grado della curva (l'unica limitazione
+                è che il grado sia sempre minore del numero di punti di controllo).
+            </li>
+            <li>
+                Non è possibile avere un <i>controllo locale</i> sulla forma della curva: la modifica della posizione di un punto
+                di controllo si propaga sull'aspetto della intera curva di Bézier.
+                Le curve B-Spline invece, permettono di avere controllo locale.
+            </li>
+        </ul>
+        Il motivo per cui le curve B-Spline presentano questi vantaggi rispetto alle curve di Bézier, deriva dal fatto che le prime
+        sono in realtà curve composite, ossia curve ottenute tramite incollamento di più segmenti di curve. Ciascuna di queste
+        è una curva polinomiale, con un suo grado e un insieme di punti di controllo. Questo permette alle curve B-Spline
+        di godere delle proprietà desiderabili di cui abbiamo discusso sopra.
+        <br>
+        Una curva B-Spline è definita da:
+        <ul class="uk-list uk-list-disc">
+            <li>
+                \( n + 1 \) punti di controllo: \(  \textbf{P}_0, \textbf{P}_1, ..., \textbf{P}_n  \);
+            </li>
+            <li>
+                Il grado della curva \( p \) (a volte si indica invece l'<i>ordine</i> della curva, uguale a \( p-1 \) );
+            </li>
+            <li>
+                Un vettore di \( p + n + 2 \) nodi (<i>knots</i>): \( (u_0, u_1, ..., u_{p+n+1}) \), necessariamente ordinati
+                in maniera non decrescente.
+            </li>
+        </ul>
+        Per modificare l'aspetto di una curva B-Spline, possiamo agire su ognuno di questi parametri: la posizione dei punti
+        di controllo, il valore dei nodi o il grado della curva.
+        <br>
+        Se non viene imposta alcuna restrizione sui nodi della curva, questa in generale non passerà per nessuno dei suoi punti di controllo,
+        nemmeno il punto iniziale o quello finale (come invece accade per le curve di Bézier).
+        La molteplicità di un nodo è il numero di volte che questo occorre all'interno del vettore dei nodi. Se si vuole che la curva
+        passi per il primo e l'ultimo punto di controllo, è necessario che il primo e l'ultimo nodo abbiano molteplicità \( p+1 \).
+        Curve B-Spline aventi questa proprietà vengono chiamate curve <i>clamped</i>.
+
+        <br>
+        L'equazione parametrica di una curva B-Spline è:
+        <br>
+        <div class="uk-align-center" style="text-align: center;">
+
+            \begin{equation} \textbf{P}(u) = \sum_{i=0}^n N_{i,p}(u)\textbf{P}_i
+            \end{equation}
+
+        </div>
+        Le funzioni \( N_{i,p}(u) \) sono le B-Spline <i>basis functions</i> e vengono usate come coefficienti per i punti
+        di controllo, così come nelle curve di Bèzier venivano usati i polinomi di Bernstein \( B_{i}^p(u) \).
+        <br>
+        Queste vengono definite ricorsivamente come segue:
+        <br>
+        <div class="uk-align-center" style="text-align: center;">
+
+            \begin{equation}
+            N_{i,0}(u) =
+            \begin{cases}
+            1, & \text{se $u_i \leq u < u_{i+1} $}\\
+            0, & \text{altrimenti}
+            \end{cases}
+            \end{equation}
+
+            <br><br><br>
+
+            \begin{equation}
+            N_{i,p}(u) =
+            \frac{u-u_i}{u_{i+p}-u_{i}}N_{i,p-1}(u) +
+            \frac{u_{i+p+1}-u}{u_{i+p+1}-u_{i+1}}N_{i+1,p-1}(u)
+            \end{equation}
+
+        </div>
+        <br>
+        Dalla definizione si ricavano le seguenti proprietà (una speculare all'altra), che sono esattamente ciò che permette
+        di avere una forma di controllo locale:
+        <ul class="uk-list uk-list-disc">
+            <li>
+                La funzione \( N_{i,p}(u) \) è non nulla solo per \( u \in [u_i, u_{i+p+1}) \), ovvero è non nulla solo per
+                \( p+1 \) intervalli del vettore di nodi (<i>knot span</i>);
+            </li>
+            <li>
+                Per ogni intervallo del vettore di nodi \( [u_i, u_{i+1}) \), al più \( p+1 \) <i>basis function</i> di grado \( p \)
+                sono non-nulle, precisamente \( N_{i-p,p}(u), N_{i-p+1,p}(u),...,N_{i,p}(u) \).
+            </li>
+        </ul>
+        Da queste proprietà si deriva immediatamente la proprietà riguardante la modifica dei punti di controllo:
+        <ul class="uk-list uk-list-disc">
+            <li>
+                Cambiando la posizione del punto di controllo \( \textbf{P}_i \), la curva \( \textbf{P}(u) \) viene
+                modificata solo per \( u \in [u_i, u_{i+p+1}) \), ossia vengono alterati al più \( p+1 \) segmenti di curva.
+            </li>
+        </ul>
+        Un'altra proprietà importante riguarda la continuità di una curva B-Spline, nei punti di "incollamento" tra le varie
+        curve componenti (<i>knot points</i>)
+        <ul class="uk-list uk-list-disc">
+            <li>
+                In corrispondenza di un nodo di molteplicità \( k \), la curva ha continuità \( C^{p-k} \).
+            </li>
+        </ul>
+        Quindi, la molteplicità di un nodo influenza la continuità della curva.
+        <br>
+        Aumentando la molteplicità di un nodo è in realtà possibile anche far sì che la curva passi per un determinato punto di controllo.
+        Infatti, vale la seguente proprietà:
+        <ul class="uk-list uk-list-disc">
+            <li>
+                Per ogni nodo interno di molteplicità \( k \), il numero di <i>basis function</i> non-nulle in quel punto
+                è al più \( p-k+1 \).
+            </li>
+        </ul>
+        Ne consegue che, in corrispondenza di un nodo di molteplicità \( p \), solo una delle <i>basis function</i> sarà
+        non nulla. Più precisamente, il valore dell'unica funzione non nulla sarà esattamente \( 1 \), per cui si avrà che la curva
+        passa per uno dei suoi punti di controllo.
+        Un caso particolare è proprio quello delle curve clamped, nominate poco sopra, che passano per il primo e l'ultimo
+        punto di controllo.
+        <h2 class="mt-5 mb-5">Superfici B-Spline</h2>
+        Una superficie B-Spline è definita a partire dalle stesse funzioni \( N_{i,p}(u) \), similarmente a come avviene
+        per le superfici di Bézier. In questo caso, le informazioni necessarie sono:
+        <ul class="uk-list uk-list-disc">
+            <li>una griglia di \( (m+1)(n+1) \) punti di controllo \( P_{i,j} \);</li>
+            <li>un vettore di \( s+1 \) nodi nella direzione \( u \), \( \{u_0, u_1, ..., u_s\} \);</li>
+            <li>un vettore di \( t+1 \) nodi nella direzione \( v \), \( \{v_0, v_1, ..., v_t\} \);</li>
+            <li>il grado \( p \) nella direzione \( u \);</li>
+            <li>il grado \( q \) nella direzione \( v \).</li>
+        </ul>
+        Con questi dati, l'equazione parametrica della superficie è:
+        <br>
+        <div class="uk-align-center" style="text-align: center;">
+
+            \begin{equation} \textbf{P}(u,v) = \sum_{i=0}^m \sum_{j=0}^n N_{i,p}(u) N_{j,q}(v) \textbf{P}_{i,j}
+            \end{equation}
+
+        </div>
+        <br>
+        <div class="m-5 mx-auto d-block">
+            <div style="float:left;margin-right:30px;">
+                <img class="shadow rounded" src="img/bspline_example_3_3.png" height="400" width="400"  />
+                <p style="text-align:center;">Superficie B-Spline di bigrado \((3,3)\), con \(m=4\) e \(n=4\)</p>
+            </div>
+            <div style="float:left;margin-right:30px;">
+                <img class="shadow rounded" src="img/bspline_example_4_4.png" height="400" width="400" />
+                <p style="text-align:center;">La stessa superficie, con bigrado aumentato a \((4,4)\)</p>
+            </div>
+        </div>
+
+        <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+
+        <h2 class="uk-heading-small uk-heading-divider mt-5 mb-5">Interpolazione con curve e superfici B-Spline</h2>
+        <h5 class="mt-3 mb-3">Interpolazione con curve</h5>
+        Supponiamo di avere \( n+1 \) punti nello spazio \( D_0, ..., D_n \) e di volerli interpolare mediante
+        una curva B-Spline di grado \( p \) (il grado viene dato come input).
+        In questa formulazione del problema, i parametri per l'interpolazione
+        \( t_0, t_1, ..., t_n \) non sono forniti dall'utente e vanno quindi generati mediante qualche tecnica,
+        ad esempio in maniera uniforme oppure basandosi sulla distanza tra i punti da interpolare (<i>chord
+        length method</i>).
+        <br>
+        Per la definizione di una curva B-Spline è necessario avere anche un vettore di nodi. Anche questo può essere
+        generato in maniera uniforme, oppure appoggiandosi sui valori dei parametri calcolati precedentemente.
+        A questo punto rimangono solo da determinare gli \( n+1 \) punti di controllo \( P_i \) tali
+        che:
+        <br>
+        <div class="uk-align-center" style="text-align: center;">
+
+            \begin{equation} \textbf{D}_k = \textbf{P}(t_k) = \sum_{i=0}^n N_{i,p}(t_k)\textbf{P}_i
+            \quad 0 \leq k \leq n
+            \end{equation}
+
+        </div>
+        <br>
+        Abbiamo quindi \( (n+1) \) equazioni, che possiamo riscrivere come sistema utilizzando le seguenti
+        matrici "formali" di punti:
+        <br> \( NP=D \)
+        <br> ossia
+        <br>
+        <div class="uk-align-center" style="text-align: center;">
+
+            \begin{equation}
+            \begin{bmatrix} N_{0, p}(t_0) & \ldots & N_{n, p}(t_0) \\ \vdots & \ddots & \vdots \\ N_{0, p}(t_n) & \ldots & N_{n, p}(t_n) \end{bmatrix}
+            \begin{bmatrix} \textbf{P}_0 \\ \vdots \\ \textbf{P}_n \end{bmatrix} =
+            \begin{bmatrix} \textbf{D}_0 \\ \vdots \\ \textbf{D}_n \end{bmatrix}
+            \end{equation}
+
+        </div>
+        <br>
+        Scrivendo al posto di ogni punto le sue coordinate affini come vettore riga, nel caso
+        di punti nello spazio tridimensionale abbiamo in pratica 3 sistemi lineari da risolvere (risolvendo
+        per colonna), ciascuno in \( n+1 \) equazioni ed \( n+1 \) incognite.
+        La determinazione dei punti di controllo quindi si riduce alla risoluzioni di questi sistemi lineari.
+        <h5 class="mt-3 mb-3">Interpolazione con superfici</h5>
+        Per l'interpolazione tramite superfici, il ragionamento visto nel caso delle curve si estende abbastanza
+        facilmente.
+        In questo caso ci viene data una matrice di \( (m+1) \) righe ed \( (n+1) \) colonne  di punti
+        \( D_{i,j} \) nello spazio, che vogliamo interpolare utilizzando una superficie B-Spline
+        di bigrado \( (p,q \) definita da \( (m+1)(n+1) \) punti di controllo.
+        <br>
+        Vanno quindi determinati \( m + 1 \) parametri
+        \( s_0, s_1, ..., s_m \)  nella direzione \( u \) e \( n + 1 \) parametri
+        \( t_0, t_1, ..., t_n \) nella direzione \( v \), così da imporre:
+        <br>
+        <div class="uk-align-center" style="text-align: center;">
+
+            \begin{equation}
+            \textbf{D}_{c,d} =
+            \textbf{P}(s_c,t_d) = \sum_{i=0}^m \sum_{j=0}^n N_{i,p}(s_c) N_{j,q}(t_d) \textbf{P}_{i,j}
+            \quad
+            0 \leq c \leq m
+            \quad
+            0 \leq d \leq n
+            \end{equation}
+
+        </div>
+        <br>
+        Manipolando questa espressione otteniamo
+        <br>
+        <div class="uk-align-center" style="text-align: center;">
+
+            \begin{equation}
+            \textbf{D}_{c,d} = \sum_{i=0}^m N_{i,p}(s_c) \textbf{Q}_{i,d}
+            \quad
+            \end{equation}
+
+        </div>
+        dove
+        <div class="uk-align-center" style="text-align: center;">
+
+            \begin{equation}
+            \textbf{Q}_{i,d} = \sum_{j=0}^n N_{j,q}(t_d) \textbf{P}_{i,j}
+            \end{equation}
+
+        </div>
+        \(\textbf{Q}_{i,d}\) è il punto su una curva B-Spline, valutata in \( t_d \), di grado \(q\) e definita dalla riga \(i\)
+        dei punti di controllo da determinare.
+        <br>
+        \(\textbf{D}_{c_d}\) è il punto su una curva B-Spline, valutata in \(s_c\), di grado \(p\) e definita dalla colonna \(d\)
+        dei punti di controllo \(\textbf{Q}\).
+        <br>
+        In questo modo, possiamo determinare la \(i\)-esima colonna dei punti di controllo "intermedi" \(\textbf{Q}\) a partire
+        dalla \(i\)-esima colonna dei punti dati \(\textbf{D}\) e dai parametri \( s_0, s_1, ..., s_m \), facendo un'interpolazione
+        tramite curve B-Spline.
+        Una volta ottenuti i punti \( \textbf{Q} \), per ottenere la \(i-esima\) riga degli effetti punti di controllo \(\textbf{P}\)
+        si fa un'altra interpolazione tramite curve B-Spline, questa volta con una curva di grado q, utilizzando come punti
+        l'\(i\)-esima riga dei punti \(\textbf{Q}\) ed i parametri \( t_0, t_1, ..., t_n \).
+
+    </div>
+</main>
+
+
+<script src="js/bootstrap.bundle.min.js"></script>
+
+
+</body>
+</html>
