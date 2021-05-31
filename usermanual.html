@@ -6,7 +6,7 @@
     <meta name="description" content="">
     <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
     <meta name="generator" content="Hugo 0.83.1">
-    <title>Top navbar example · Bootstrap v5.0</title>
+    <title>Manuale utente</title>
 
     <link rel="canonical" href="https://getbootstrap.com/docs/5.0/examples/navbar-static/">
 
@@ -34,6 +34,14 @@
 
     <!-- Custom styles for this template -->
     <link href="css/navbar-top.css" rel="stylesheet">
+
+    <script src="js/uikit.min.js"></script>
+    <script src="js/uikit-icons.min.js"></script>
+    <script src="https://fred-wang.github.io/mathml.css/mspace.js"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async
+            src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
 </head>
 <body>
 
@@ -52,10 +60,10 @@
                     <a class="nav-link active" href="usermanual.html">Manuale utente</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="applet.html">Teoria</a>
+                    <a class="nav-link" href="theory.html">Teoria</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="theory.html">Applet</a>
+                    <a class="nav-link" href="applet.html">Applet</a>
                 </li>
             </ul>
         </div>
@@ -80,9 +88,12 @@
                             l'utilizzo se non per scene molto semplici.</b> </li>
                     <li>Cambiare il massimo livello di "profondità" che può essere raggiunto dal calcolo ricorsivo per l'illuminazione (rilevante
                         solo per oggetti che hanno una componente di riflessione o se viene simulata l'illuminazione indiretta).</li>
-                    <li>Modificare la scena, aggiungendo oggetti o fonti luminose, oppure modificando o rimuovendo quelli esistenti.</li>
+                    <li>
+                        Attivare o disattivare le ombre sugli oggetti <i>Mirror-like</i> e <i>transparent</i>
+                    </li>
                 </ul>
             </li>
+            <li>Modificare la scena, aggiungendo oggetti o fonti luminose, oppure modificando o rimuovendo quelli esistenti.</li>
         </ul>
         <img class="shadow rounded mx-auto d-block mt-5 mb-5" src="img/main_window.PNG">
         <h2 class="mt-5 mb-5">Gestione oggetti</h2>
@@ -90,6 +101,8 @@
         cartesiano destrorso. La <i>camera</i> (il punto di vista) è posizionata nell'origine di tale sistema e orientata nella direzione
         opposta all'asse \(z\). Per ogni oggetto, è possibile specificare una trasformazione affine per ruotarlo, espanderlo o traslarlo
         all'interno della scena. <br>
+        <b>NOTA: Il programma non gestisce la presenza di eventuali collisioni tra gli oggetti inseriti</b>.
+        <br>
         <img class="shadow rounded float-end m-3" src="img/add_sphere_window.PNG">
         Sono supportate cinque tipologie di oggetti:
         <ul>
@@ -194,6 +207,33 @@
         che indica lo stato di completamento del processo di rendering. La percentuale visualizzata si riferisce alla percentuale di immagine che è stata renderizzata
         e, poichè il tempo di rendering può variare molto da un pixel all'altro,  non è quindi effettivamente indicativa del tempo necessario rimanente.
     </div>
+    <footer class="bg-light text-center text-lg-start" >
+        <!-- Grid container -->
+        <div class="container p-4" style="background-color: rgba(0, 0, 0, 0.05);">
+            <!--Grid row-->
+            <div class="row">
+                <!--Grid column-->
+                <div class="col-lg-6 col-md-12 mb-4 mb-md-0">
+                    <img src="img/unimi_logo_.png" class="w-50 float-end">
+                </div>
+                <!--Grid column-->
+
+                <!--Grid column-->
+                <div class="col-lg-6 col-md-12 mb-4 mb-md-0">
+                    <p>
+                        Riccardo Di Bella <br>
+                        <a class="text-reset fw-bold" href= "mailto:riccardo.dibella@studenti.unimi.it">riccardo.dibella@studenti.unimi.it</a> <br>
+                        Università degli Studi di Milano <br>
+                        2020/2021
+                    </p>
+                </div>
+                <!--Grid column-->
+            </div>
+            <!--Grid row-->
+        </div>
+        <!-- Grid container -->
+
+    </footer>
 </main>
 
 
